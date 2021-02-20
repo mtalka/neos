@@ -31,7 +31,7 @@
 import Vue from "vue";
 import Asteroid from "./Asteroid.vue";
 import LoadingPlaceholder from "./LoadingPlaceholder.vue";
-import { AsteroidType } from "@/types"; // Our interface
+import { AsteroidType } from "@/types";
 
 export default Vue.extend({
   name: "SpaceView",
