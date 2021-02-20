@@ -39,7 +39,7 @@ export default Vue.extend({
       const text = 100 - percentage * 100;
       return text.toString() + "%";
     },
-    hazardColor() {
+    hazardColor(): string {
       return this.hazardous ? "red" : "limegreen";
     },
   },
@@ -79,7 +79,7 @@ export default Vue.extend({
   animation: fadeIn 2s;
   color: #fff;
   font-family: Consolas;
-  font-size: 0.7rem;
+  font-size: 0.85rem;
 }
 @keyframes fadeIn {
   0% {

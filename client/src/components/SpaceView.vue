@@ -1,6 +1,7 @@
 <template>
   <div>
     <div class="sun" title="Sun" v-on:click="chooseRandom" />
+    <LoadingPlaceholder v-if="loading === true" />
     <Asteroid
       v-if="loading === false"
       v-bind:name="chosenAsteroid.name"
@@ -16,7 +17,11 @@
       v-bind:style="{ top: missDistanceInfoPosition }"
     >
       <div>Miss distance</div>
-      <div>{{ this.missDistance }} km</div>
+      <div>{{ this.thousandSeparator(this.missDistance.toString()) }} km</div>
+      <div>
+        {{ ((this.missDistance / this.solarDistance) * 100).toFixed(1) }}% of
+        distance to sun
+      </div>
     </div>
     <div class="earth" title="Earth" v-on:click="chooseClosestMiss" />
   </div>
@@ -25,24 +30,27 @@
 <script lang="ts">
 import Vue from "vue";
 import Asteroid from "./Asteroid.vue";
+import LoadingPlaceholder from "./LoadingPlaceholder.vue";
 import { AsteroidType } from "@/types"; // Our interface
 
 export default Vue.extend({
   name: "SpaceView",
   components: {
     Asteroid,
+    LoadingPlaceholder,
   },
   data: () => ({
     chosenAsteroid: {} as AsteroidType,
     missDistance: 0,
     loading: true,
+    solarDistance: 149600000,
   }),
   props: {
     msg: String,
   },
   computed: {
     missDistanceInfoPosition(): string {
-      const text = this.missDistance < 40000000 ? "50%" : "85%";
+      const text = this.missDistance < 40000000 ? "60%" : "85%";
       return text;
     },
   },
@@ -62,48 +70,35 @@ export default Vue.extend({
           parseFloat(b.close_approach_data[0].miss_distance.kilometers)
       );
       const closestAsteroid = sortedAsteroids[0];
-      const missDistanceKm =
-        closestAsteroid.close_approach_data[0].miss_distance.kilometers;
-      this.missDistance = Number(missDistanceKm).toFixed(0);
-      this.chosenAsteroid = {
-        name: closestAsteroid.name,
-        asteroidId: closestAsteroid.id,
-        minDiameter: closestAsteroid.estimated_diameter.meters.estimated_diameter_min.toFixed(
-          0
-        ),
-        maxDiameter: closestAsteroid.estimated_diameter.meters.estimated_diameter_max.toFixed(
-          0
-        ),
-        hazardous: closestAsteroid.is_potentially_hazardous_asteroid,
-        missDistance:
-          closestAsteroid.close_approach_data[0].miss_distance.kilometers <
-          15000000
-            ? 15000000
-            : closestAsteroid.close_approach_data[0].miss_distance.kilometers,
-      };
+      this.setDisplayedAsteroid(closestAsteroid);
     },
     chooseRandom() {
       const r = Math.random() * (this.$store.state.asteroids.length - 0) + 0;
       const randomAsteroid = this.$store.state.asteroids[Math.floor(r)];
+      this.setDisplayedAsteroid(randomAsteroid);
+    },
+    setDisplayedAsteroid(asteroid: any) {
       const missDistanceKm =
-        randomAsteroid.close_approach_data[0].miss_distance.kilometers;
-      this.missDistance = Number(missDistanceKm).toFixed(0);
+        asteroid.close_approach_data[0].miss_distance.kilometers;
+      this.missDistance = Number(Number(missDistanceKm).toFixed(0));
       this.chosenAsteroid = {
-        name: randomAsteroid.name,
-        asteroidId: randomAsteroid.id,
-        minDiameter: randomAsteroid.estimated_diameter.meters.estimated_diameter_min.toFixed(
+        name: asteroid.name,
+        asteroidId: asteroid.id,
+        minDiameter: asteroid.estimated_diameter.meters.estimated_diameter_min.toFixed(
           0
         ),
-        maxDiameter: randomAsteroid.estimated_diameter.meters.estimated_diameter_max.toFixed(
+        maxDiameter: asteroid.estimated_diameter.meters.estimated_diameter_max.toFixed(
           0
         ),
-        hazardous: randomAsteroid.is_potentially_hazardous_asteroid,
+        hazardous: asteroid.is_potentially_hazardous_asteroid,
         missDistance:
-          randomAsteroid.close_approach_data[0].miss_distance.kilometers <
-          15000000
+          asteroid.close_approach_data[0].miss_distance.kilometers < 15000000
             ? 15000000
-            : randomAsteroid.close_approach_data[0].miss_distance.kilometers,
+            : asteroid.close_approach_data[0].miss_distance.kilometers,
       };
+    },
+    thousandSeparator(numToFix: string) {
+      return numToFix.replace(/\B(?=(\d{3})+(?!\d))/g, " ");
     },
   },
 });
@@ -146,6 +141,7 @@ export default Vue.extend({
   position: absolute;
   left: 50%;
   transform: translate(-50%, -50%);
+  color: #59738c;
 }
 @media (max-width: 768px) {
   .earth {
