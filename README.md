@@ -23,3 +23,5 @@ The application uses NASA's record of near earth objects from December 19th to D
 The application shows basic characteristics of the object, along with how near miss it was on a scale of Earth to Sun, with Earth being on the bottom of the page and Sun being on the top.
 
 As an easter egg, you can also see other near earth objects that occurred during 2015 Christmas week by clicking on the Sun. This will give you a random asteroid from the application store. If you want to see the default nearest miss object again, just click Earth.
+
+![ScreenShot](https://i.imgur.com/ZOQ1E5m.png)
