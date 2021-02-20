@@ -14,6 +14,8 @@ after which you should be able to start the service by typing
 npm run start
 ```
 
+and navigating your browser to the location mentioned in the console.
+
 #### Information
 
 The application uses NASA's record of near earth objects from December 19th to December 26th 2016, and determines based on the data the nearest missing object (asteroid) during that time.
