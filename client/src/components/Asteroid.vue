@@ -1,16 +1,21 @@
 <template>
   <div class="asteroid-container" v-bind:style="{ top: distanceInPercentage }">
     <div class="info">
-      <div>Name: {{ name }}</div>
-      <div>ID: {{ asteroidId }}</div>
+      <div>Name: {{ chosenAsteroid.name }}</div>
+      <div>ID: {{ chosenAsteroid.asteroidId }}</div>
     </div>
     <div class="asteroid" v-bind:style="{ borderColor: hazardColor }">
       <div class="dot"></div>
     </div>
     <div class="info">
-      <div>Diameter: {{ minDiameter }}m min; {{ maxDiameter }}m max</div>
       <div>
-        <span v-if="hazardous" style="color: red;">Potentially hazardous</span>
+        Diameter: {{ chosenAsteroid.minDiameter }}m min;
+        {{ chosenAsteroid.maxDiameter }}m max
+      </div>
+      <div>
+        <span v-if="chosenAsteroid.hazardous" style="color: red;"
+          >Potentially hazardous</span
+        >
         <span v-else style="color: limegreen;">No hazard</span>
       </div>
     </div>
@@ -19,6 +24,7 @@
 
 <script lang="ts">
 import Vue from "vue";
+import { AsteroidType } from "@/types";
 
 export default Vue.extend({
   name: "Asteroid",
@@ -26,21 +32,21 @@ export default Vue.extend({
     solarDistance: 149600000,
   }),
   props: {
-    name: String,
-    asteroidId: String,
-    minDiameter: String,
-    maxDiameter: String,
-    hazardous: Boolean,
-    missDistance: Number,
+    chosenAsteroid: {
+      type: Object as () => AsteroidType,
+    },
   },
   computed: {
+    // Calculate rough percentage in order to give users idea of miss distance in solar scale
     distanceInPercentage(): string {
-      const percentage: number = this.$props.missDistance / this.solarDistance;
+      const percentage: number =
+        Number(this.$props.chosenAsteroid.missDistance) / this.solarDistance;
       const text = 100 - percentage * 100;
       return text.toString() + "%";
     },
+    // yer a hazard, wirry
     hazardColor(): string {
-      return this.hazardous ? "red" : "limegreen";
+      return this.chosenAsteroid.hazardous ? "red" : "limegreen";
     },
   },
 });

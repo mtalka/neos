@@ -2,15 +2,7 @@
   <div>
     <div class="sun" title="Sun" v-on:click="chooseRandom" />
     <LoadingPlaceholder v-if="loading === true" />
-    <Asteroid
-      v-if="loading === false"
-      v-bind:name="chosenAsteroid.name"
-      v-bind:asteroidId="chosenAsteroid.asteroidId"
-      v-bind:minDiameter="chosenAsteroid.minDiameter"
-      v-bind:maxDiameter="chosenAsteroid.maxDiameter"
-      v-bind:hazardous="chosenAsteroid.hazardous"
-      v-bind:missDistance="Number(chosenAsteroid.missDistance)"
-    />
+    <Asteroid v-if="loading === false" v-bind:chosenAsteroid="chosenAsteroid" />
     <div
       v-if="loading === false"
       class="miss-distance"
@@ -49,6 +41,7 @@ export default Vue.extend({
     msg: String,
   },
   computed: {
+    // Position the miss distance text so that it doesn't overlap with the asteroid info
     missDistanceInfoPosition(): string {
       const text = this.missDistance < 40000000 ? "60%" : "85%";
       return text;
@@ -81,6 +74,9 @@ export default Vue.extend({
       const missDistanceKm =
         asteroid.close_approach_data[0].miss_distance.kilometers;
       this.missDistance = Number(Number(missDistanceKm).toFixed(0));
+
+      // A considered number for threshold so that the displayed asteroid doesn't drop off page
+      const missDistanceThreshold = 15000000;
       this.chosenAsteroid = {
         name: asteroid.name,
         asteroidId: asteroid.id,
@@ -92,11 +88,13 @@ export default Vue.extend({
         ),
         hazardous: asteroid.is_potentially_hazardous_asteroid,
         missDistance:
-          asteroid.close_approach_data[0].miss_distance.kilometers < 15000000
-            ? 15000000
+          asteroid.close_approach_data[0].miss_distance.kilometers <
+          missDistanceThreshold
+            ? missDistanceThreshold
             : asteroid.close_approach_data[0].miss_distance.kilometers,
       };
     },
+    // Separating thousands in large numbers for readability
     thousandSeparator(numToFix: string) {
       return numToFix.replace(/\B(?=(\d{3})+(?!\d))/g, " ");
     },
